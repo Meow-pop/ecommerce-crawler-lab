@@ -6,22 +6,22 @@
 
 ```text
 ┌──────────────────────────┐
-│ target: FastAPI          │
+│ 目标实验站：FastAPI      │
 │                          │
 │ /                        │
 │ /api/bootstrap           │
 │ /api/products            │
 │ /health                  │
 └────────────┬─────────────┘
-             │ HTTP + Cookie + HMAC headers
+             │ HTTP + Cookie + HMAC 请求头
 ┌────────────▼─────────────┐
-│ crawler: Python stdlib   │
+│ 采集器：Python 标准库    │
 │                          │
-│ bootstrap/session        │
-│ canonical signing        │
-│ retry/backoff            │
-│ validation/deduplication │
-│ JSON + CSV               │
+│ 初始化与会话             │
+│ 规范化请求签名           │
+│ 重试与退避               │
+│ 数据校验与去重           │
+│ 输出 JSON 与 CSV         │
 └──────────────────────────┘
 ```
 
