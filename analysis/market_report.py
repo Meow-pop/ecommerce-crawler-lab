@@ -53,6 +53,7 @@ def require_payload(payload: Mapping[str, Any]) -> List[Mapping[str, Any]]:
 def build_report(payload: Mapping[str, Any]) -> str:
     items = require_payload(payload)
     query = str(payload.get("query") or "未命名关键词")
+    source = str(payload.get("source") or "公开商品来源")
     prices = [float(item["price_cny"]) for item in items if item.get("price_cny") is not None]
     if not prices:
         raise ReportError("没有可用于价格分析的商品")
@@ -79,9 +80,9 @@ def build_report(payload: Mapping[str, Any]) -> str:
     )[:5]
 
     lines = [
-        f"# “{query}”国内电商市场快照",
+        f"# “{query}”{source}公开商品市场快照",
         "",
-        f"> 数据源：{payload.get('source', '未知')}公开搜索首屏  ",
+        f"> 数据源：{source}公开搜索首屏  ",
         f"> 采集时间：{payload.get('collected_at', '未知')}  ",
         f"> 样本量：{len(items)} 件；该报告描述当前公开样本，不代表平台完整销量。",
         "",

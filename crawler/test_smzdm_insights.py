@@ -17,8 +17,8 @@ from smzdm_insights import (
 
 
 SAMPLE_CARD = {
-    "title": "京东50元入手316L保温杯",
-    "excerpt": "天猫同款约79.9元，容量500ml，纯钛款更贵。",
+    "title": "苏宁50元入手316L保温杯",
+    "excerpt": "公开页面同款约79.9元，容量500ml，纯钛款更贵。",
     "likes": "131",
     "favorites": "232",
     "comments": "129",
@@ -43,7 +43,7 @@ class SmzdmInsightTests(unittest.TestCase):
 
     def test_market_signal_extractors(self):
         text = SAMPLE_CARD["title"] + " " + SAMPLE_CARD["excerpt"]
-        self.assertEqual(extract_platforms(text), ["京东", "天猫"])
+        self.assertEqual(extract_platforms(text), ["苏宁"])
         self.assertEqual(extract_prices(text), [50.0, 79.9])
         self.assertEqual(extract_materials(text), ["316不锈钢", "纯钛"])
         self.assertEqual(extract_capacities(text), [500])
@@ -52,7 +52,7 @@ class SmzdmInsightTests(unittest.TestCase):
         item = normalize_card(SAMPLE_CARD, 1, "保温杯", "now")
         self.assertEqual(item.insight_id, "a60l2nwn")
         self.assertEqual(item.comments, 129)
-        self.assertEqual(item.mentioned_platforms, ["京东", "天猫"])
+        self.assertEqual(item.mentioned_platforms, ["苏宁"])
         self.assertEqual(item.mentioned_prices_cny, [50.0, 79.9])
 
     def test_invalid_article_host_is_rejected(self):
@@ -68,7 +68,7 @@ class SmzdmInsightTests(unittest.TestCase):
             self.assertEqual(json.loads(json_path.read_text(encoding="utf-8"))["items"][0]["likes"], 131)
             with csv_path.open("r", encoding="utf-8-sig", newline="") as stream:
                 row = next(csv.DictReader(stream))
-            self.assertEqual(json.loads(row["mentioned_platforms"]), ["京东", "天猫"])
+            self.assertEqual(json.loads(row["mentioned_platforms"]), ["苏宁"])
 
 
 if __name__ == "__main__":

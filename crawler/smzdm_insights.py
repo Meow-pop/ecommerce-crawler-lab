@@ -93,13 +93,7 @@ def check_robots(url: str) -> None:
 
 def extract_platforms(text: str) -> List[str]:
     aliases = {
-        "京东": ("京东", "JD"),
-        "淘宝": ("淘宝",),
-        "天猫": ("天猫",),
-        "拼多多": ("拼多多", "拼夕夕", "PDD", "pdd"),
-        "苏宁": ("苏宁",),
-        "闲鱼": ("闲鱼", "海鲜市场"),
-        "小米有品": ("小米有品",),
+        "苏宁": ("苏宁", "苏宁易购"),
     }
     return [name for name, terms in aliases.items() if any(term in text for term in terms)]
 
