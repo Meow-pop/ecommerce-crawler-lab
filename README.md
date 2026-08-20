@@ -1,0 +1,129 @@
+# Ecommerce Crawler Lab
+
+一个面向爬虫、数据采集和 AI 市场调研岗位的安全作品集项目。仓库包含自有动态电商实验站、可自动运行的苏宁公开商品适配器，以及实验性的消费者内容适配器。
+
+## 为什么使用自有实验站
+
+淘宝、京东、拼多多和抖音等真实平台会持续更新访问控制，未经许可的批量采集还涉及平台条款、账号安全和合规风险。本项目不破解验证码、不伪造设备、不使用代理池，也不调用第三方私有接口。
+
+自有实验站复现工程问题，允许在明确授权的环境中展示同类能力：
+
+- JavaScript 动态加载商品；
+- Cookie 会话和短期请求令牌；
+- HMAC-SHA256 请求签名；
+- 时间戳与一次性 nonce 校验；
+- HTTP 429 限流和 `Retry-After`；
+- 分页、去重、字段校验与证据元数据；
+- JSON/CSV 导出和电子表格公式注入防护。
+
+## 当前里程碑
+
+- [x] 建立本地动态电商实验站
+- [x] 实现签名校验、会话、nonce 和限流
+- [x] 实现标准库采集器及 JSON/CSV 导出
+- [x] 添加单元测试和 PowerShell 脚本
+- [x] 增加苏宁公开搜索商品与价格适配器
+- [x] 增加什么值得买公开分类解析器与访问限制诊断
+- [ ] 增加选择器变更与多版本页面
+- [ ] 增加 Redis 任务队列和 PostgreSQL
+- [ ] 增加采集质量看板与告警
+- [ ] 增加第二个经确认允许采集的国内公开来源适配器
+
+## 快速开始
+
+要求：Windows 10/11、Docker Desktop 和 Docker Compose。
+
+启动实验站：
+
+```powershell
+.\scripts\Start-Lab.ps1
+```
+
+浏览器访问：<http://127.0.0.1:8081>
+
+采集三页“保温杯”并导出：
+
+```powershell
+.\scripts\Run-Collector.ps1 -Keyword "保温杯" -Pages 3
+```
+
+结果写入 `data/`。停止实验站：
+
+```powershell
+.\scripts\Stop-Lab.ps1
+```
+
+## 国内真实商品采集
+
+苏宁公开搜索页是第一条可自动运行的国内数据链路。首次安装浏览器渲染依赖：
+
+```powershell
+.\scripts\Install-Browser-Collector.ps1
+```
+
+采集最多 30 件“保温杯”商品：
+
+```powershell
+.\scripts\Run-Suning-Collector.ps1 -Keyword "保温杯"
+```
+
+采集器先读取并校验 `robots.txt`，再获取公开 HTML；价格由本机 Edge 正常渲染后读取。它不登录、不翻页、不并发，也不调用账户或订单接口。
+
+一键完成采集、质量检查和市场报告：
+
+```powershell
+.\scripts\Run-Domestic-Research.ps1 -Keyword "保温杯" -MaxItems 30
+```
+
+结果目录中会同时生成原始 JSON、便于查看的 CSV，以及包含价格带、店铺集中度、材质/容量、广告占比、热门商品和证据链接的 Markdown 报告。
+
+## 实验性消费者洞察快照
+
+首个真实数据源使用什么值得买的公开分类页。它不等同于淘宝商品库，而是汇总消费者文章中的价格、渠道、材质、容量和互动信号，适合生成需求痛点、价格认知和竞品讨论报告。
+
+什么值得买页面在普通浏览器中可访问，但当前会拦截独立 Playwright 自动化环境。因此下面的命令目前用于验证“遇到限制即停止”的行为，不作为无人值守数据源：
+
+```powershell
+.\scripts\Run-SMZDM-Insights.ps1
+```
+
+脚本使用电脑现有的 Microsoft Edge，不登录、不翻页、不解决验证码。其他分类必须传入已核对的 `https://www.smzdm.com/fenlei/.../` 地址：
+
+```powershell
+.\scripts\Run-SMZDM-Insights.ps1 -Category "分类名称" -Url "https://www.smzdm.com/fenlei/分类路径/"
+```
+
+运行单元测试：
+
+```powershell
+.\scripts\Test-Lab.ps1
+```
+
+## 采集链路
+
+```text
+模拟商城页面
+    ↓ POST /api/bootstrap
+获得 Cookie 会话 + 临时签名令牌
+    ↓ HMAC(timestamp + nonce + query + page)
+GET /api/products
+    ↓ 401/409/429 分类处理
+字段校验 → 去重 → JSON/CSV
+```
+
+## 输出字段
+
+`rank`、`product_id`、`title`、`brand`、`price`、`monthly_sales`、`rating`、`review_count`、`capacity_ml`、`material`、`stock`、`product_url`、`source_url`、`collected_at`。
+
+苏宁来源输出 `product_id`、`sku_id`、`title`、`price_cny`、`review_count_lower_bound`、`store_name`、`selling_point`、`is_sponsored`、`mentioned_materials`、`capacity_ml`、`product_url`、`source_url` 和 `collected_at`。还会报告价格、店铺和评价字段完整率。
+
+## 安全与合规边界
+
+- 只对仓库自带实验站或明确允许自动访问的目标运行采集器。
+- 遇到验证码、安全验证、账号限制或明确禁止自动化访问时停止。
+- 不将这个实验站的令牌算法描述成真实平台算法。
+- 真实网站适配器必须单独记录来源、访问条件、速率和数据用途。
+- 不提交 Cookie、账号、API 密钥、代理凭证或真实个人数据。
+- 什么值得买搜索子域明确禁止自动访问，本项目只处理核对过的公开分类页。
+
+架构说明见 [docs/architecture.md](docs/architecture.md)，真实来源边界见 [docs/public-source-policy.md](docs/public-source-policy.md)，后续路线见 [docs/roadmap.md](docs/roadmap.md)。

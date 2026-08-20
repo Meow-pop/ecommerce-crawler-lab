@@ -1,0 +1,4 @@
+# Python 3.9 on Windows needs a greenlet release that still publishes a
+# prebuilt cp39 wheel; this avoids requiring Visual C++ Build Tools.
+playwright==1.55.0
+greenlet==3.1.1
